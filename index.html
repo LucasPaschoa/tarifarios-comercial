@@ -45,6 +45,7 @@
   <select id="servico" onchange="mostrarCampoValor()">
     <option value="funerario">Funerário</option>
     <option value="premium">Premium</option>
+    <option value="expresso">Expresso</option>
   </select>
 
   <div id="valorDeclaradoContainer">
@@ -75,18 +76,30 @@
     - Coleta: R$ 25,00 até 10kg + R$ 0,62/kg adicional<br>
     - Deslocamento aeroporto: R$ 50,00 até 10kg + R$ 1,00/kg adicional<br>
     - Reembalagem: R$ 4,00/kg<br>
-    - Devolução: 100% do valor da ida
+    - Devolução: 100% do valor da ida<br>
+    <strong>Observações Expresso:</strong><br>
+    - Ad-valorem + GRIS: 0,70%<br>
+    - Ad-valorem carga valor: 1,40%<br>
+    - Ad-valorem carga valor interior: 1,80%<br>
+    - Ad-valorem interior: 0,90%<br>
+    - Artigos Perigosos: R$ 28,00<br>
+    - Radioativos: R$ 80,00<br>
+    - Coleta: R$ 22,60 até 10kg + R$ 0,56/kg adicional<br>
+    - Deslocamento aeroporto: R$ 50,00 até 10kg + R$ 1,00/kg adicional<br>
+    - Reembalagem: R$ 4,00/kg<br>
+    - Devolução: 100% do valor da emissão original
   </div>
 
   <script src="dados-funerario.js"></script>
   <script src="dados-premium.js"></script>
+  <script src="dados-expresso.js"></script>
   <script>
     function popularSelects() {
       const origemSelect = document.getElementById("origem");
       const destinoSelect = document.getElementById("destino");
 
       const servico = document.getElementById("servico").value;
-      let dados = servico === "premium" ? tabelaPremium : tabelaFunerario;
+      let dados = servico === "premium" ? tabelaPremium : servico === "expresso" ? tabelaExpresso : tabelaFunerario;
 
       const origens = [...new Set(dados.map(r => r.origem))].sort();
       const destinos = [...new Set(dados.map(r => r.destino))].sort();
@@ -98,7 +111,7 @@
     function mostrarCampoValor() {
       const servico = document.getElementById("servico").value;
       const container = document.getElementById("valorDeclaradoContainer");
-      container.style.display = servico === "premium" ? "block" : "none";
+      container.style.display = (servico === "premium" || servico === "expresso") ? "block" : "none";
       popularSelects();
     }
 
@@ -143,6 +156,35 @@
         const total = valorBase + capatazia + emissao + advalorem;
 
         document.getElementById("resultado").innerText = `Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia, emissão e ad-valorem)`;
+      }
+
+      if (servico === "expresso") {
+        rota = tabelaExpresso.find(r => (r.origem === origem || r.origem === "BR") && (r.destino === destino || r.destino === "BR"));
+        if (!rota) return document.getElementById("resultado").innerText = "Rota não encontrada.";
+
+        const tipos = ["capital", "interior", "redespacho"];
+        let resultados = [];
+
+        tipos.forEach(tipo => {
+          let dados = rota[tipo];
+          if (dados) {
+            let valorBase = 0;
+            if (peso <= 0.1 && dados.ate_100g) {
+              valorBase = dados.ate_100g;
+            } else if (peso > 0.1 && peso <= 30) {
+              valorBase = dados.tarifas[Math.ceil(peso).toString()] || 0;
+            } else {
+              valorBase = dados.tarifas["30"] + (peso - 30) * dados.adicional;
+            }
+            const capatazia = peso * 0.20;
+            const emissao = 4.00;
+            const advalorem = valorDeclarado * 0.007; // 0.7% padrão
+            const total = valorBase + capatazia + emissao + advalorem;
+            resultados.push(`${tipo.charAt(0).toUpperCase() + tipo.slice(1)}: R$ ${total.toFixed(2)}`);
+          }
+        });
+
+        document.getElementById("resultado").innerText = resultados.length ? resultados.join("\n") : "Sem tarifas disponíveis para essa rota.";
       }
     }
 
