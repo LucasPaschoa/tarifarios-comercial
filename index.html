@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador de Tarifas</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 1em;
+      transition: background-color 0.3s ease;
+    }
+    label, select, input, button {
+      display: block;
+      margin: 0.5em 0;
+      width: 100%;
+      padding: 0.5em;
+    }
+    #resultado {
+      margin-top: 1em;
+      font-weight: bold;
+    }
+    #logo {
+      display: block;
+      margin: 0 auto 1em auto;
+      max-width: 200px;
+    }
+    #observacao {
+      font-size: 0.9em;
+      margin-top: 1em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <img id="logo" src="" alt="Logo da empresa" />
+
+  <h1>Simulador de Tarifas</h1>
+
+  <label for="servico">Serviço:</label>
+  <select id="servico" onchange="atualizarTema()">
+    <option value="funerario">Funerário</option>
+  </select>
+
+  <label for="origem">Origem:</label>
+  <select id="origem"></select>
+
+  <label for="destino">Destino:</label>
+  <select id="destino"></select>
+
+  <label for="peso">Peso (kg):</label>
+  <input type="number" step="0.01" id="peso" />
+
+  <button onclick="calcularTarifa()">Calcular</button>
+
+  <div id="resultado"></div>
+  <div id="observacao">Impressão de documento adicional: R$ 1,00/página</div>
+
+  <script src="dados-funerario.js"></script>
+  <script>
+    function popularSelects() {
+      const origemSelect = document.getElementById("origem");
+      const destinoSelect = document.getElementById("destino");
+
+      const origens = [...new Set(tabelaFunerario.map(r => r.origem))].sort();
+      const destinos = [...new Set(tabelaFunerario.map(r => r.destino))].sort();
+
+      origemSelect.innerHTML = origens.map(o => `<option value="${o}">${o}</option>`).join('');
+      destinoSelect.innerHTML = destinos.map(d => `<option value="${d}">${d}</option>`).join('');
+    }
+
+    function calcularTarifa() {
+      const servico = document.getElementById("servico").value;
+      const origem = document.getElementById("origem").value;
+      const destino = document.getElementById("destino").value;
+      const peso = parseFloat(document.getElementById("peso").value);
+
+      if (servico === "funerario") {
+        const rota = tabelaFunerario.find(r => r.origem === origem && r.destino === destino);
+        if (!rota) {
+          document.getElementById("resultado").innerText = "Rota não encontrada.";
+          return;
+        }
+
+        let valorBase = rota.minimo;
+        if (peso > 6) {
+          valorBase += (peso - 6) * rota.adicional;
+        }
+
+        const capatazia = peso * 0.20;
+        const emissao = 4.00;
+        const total = valorBase + capatazia + emissao;
+
+        document.getElementById("resultado").innerText = `Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia e emissão)`;
+      }
+    }
+
+    function atualizarTema() {
+      const servico = document.getElementById("servico").value;
+      let corFundo = "#ffffff";
+      if (servico === "funerario") corFundo = "#041e42";
+      document.body.style.backgroundColor = corFundo;
+    }
+
+    window.onload = () => {
+      popularSelects();
+      atualizarTema();
+    };
+  </script>
+</body>
+</html>
