@@ -10,7 +10,6 @@
       max-width: 600px;
       margin: auto;
       padding: 1em;
-      transition: background-color 0.3s ease;
     }
     label, select, input, button {
       display: block;
@@ -40,7 +39,7 @@
   <h1>Simulador de Tarifas</h1>
 
   <label for="servico">Serviço:</label>
-  <select id="servico" onchange="atualizarTema()">
+  <select id="servico">
     <option value="funerario">Funerário</option>
   </select>
 
@@ -97,16 +96,8 @@
       }
     }
 
-    function atualizarTema() {
-      const servico = document.getElementById("servico").value;
-      let corFundo = "#ffffff";
-      if (servico === "funerario") corFundo = "#041e42";
-      document.body.style.backgroundColor = corFundo;
-    }
-
     window.onload = () => {
       popularSelects();
-      atualizarTema();
     };
   </script>
 </body>
