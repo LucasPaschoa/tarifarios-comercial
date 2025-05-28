@@ -38,6 +38,9 @@
     .oculto {
       display: none;
     }
+    #origem-container, #destino-container {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -137,6 +140,8 @@
     function mostrarCampoValor() {
       const servico = document.getElementById("servico").value;
       document.getElementById("valorDeclaradoContainer").style.display = (servico !== "funerario") ? "block" : "none";
+      document.getElementById("origem-container").style.display = (servico === "standard") ? "block" : "none";
+      document.getElementById("destino-container").style.display = (servico === "standard") ? "block" : "none";
 
       if (servico === "standard") {
         const siglas = [...new Set(tabelaStandard.map(r => r.sigla_origem))].sort();
@@ -150,6 +155,36 @@
         document.getElementById("siglas_destino").innerHTML = siglas.map(o => `<option value="${o}">`).join('');
         document.getElementById("cidades_destino").innerHTML = cidades.map(o => `<option value="${o}">`).join('');
         document.getElementById("ufs_destino").innerHTML = ufs.map(o => `<option value="${o}">`).join('');
+      }
+    }
+
+    function calcularTarifa() {
+      const servico = document.getElementById("servico").value;
+      const peso = parseFloat(document.getElementById("peso").value);
+      const valorDeclarado = parseFloat(document.getElementById("valorDeclarado").value || 0);
+
+      if (servico === "standard") {
+        const siglaOrigem = document.getElementById("sigla_origem").value;
+        const cidadeOrigem = document.getElementById("cidade_origem").value;
+        const ufOrigem = document.getElementById("uf_origem").value;
+        const siglaDestino = document.getElementById("sigla_destino").value;
+        const cidadeDestino = document.getElementById("cidade_destino").value;
+        const ufDestino = document.getElementById("uf_destino").value;
+
+        const rota = tabelaStandard.find(r =>
+          (r.sigla_origem === siglaOrigem || r.cidade_origem === cidadeOrigem || r.uf_origem === ufOrigem) &&
+          (r.sigla_destino === siglaDestino || r.cidade_destino === cidadeDestino || r.uf_destino === ufDestino)
+        );
+
+        if (!rota) return document.getElementById("resultado").innerText = "Rota não encontrada.";
+
+        let valorBase = peso <= 30 ? rota.minimo : rota.minimo + (peso - 30) * rota.adicional;
+        const capatazia = peso * 0.20;
+        const emissao = 4.00;
+        const advalorem = valorDeclarado * 0.004;
+        const total = valorBase + capatazia + emissao + advalorem;
+
+        return document.getElementById("resultado").innerText = `Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia, emissão e ad-valorem)`;
       }
     }
   </script>
