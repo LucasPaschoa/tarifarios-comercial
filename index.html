@@ -59,15 +59,31 @@
   </div>
 
   <div id="origem-container">
-    <label for="origem">Origem (sigla, cidade ou UF):</label>
-    <input list="origens" id="origem" name="origem">
-    <datalist id="origens"></datalist>
+    <label for="sigla_origem">Sigla Origem:</label>
+    <input list="siglas_origem" id="sigla_origem" name="sigla_origem">
+    <datalist id="siglas_origem"></datalist>
+
+    <label for="cidade_origem">Cidade Origem:</label>
+    <input list="cidades_origem" id="cidade_origem" name="cidade_origem">
+    <datalist id="cidades_origem"></datalist>
+
+    <label for="uf_origem">UF Origem:</label>
+    <input list="ufs_origem" id="uf_origem" name="uf_origem">
+    <datalist id="ufs_origem"></datalist>
   </div>
 
   <div id="destino-container">
-    <label for="destino">Destino (sigla, cidade ou UF):</label>
-    <input list="destinos" id="destino" name="destino">
-    <datalist id="destinos"></datalist>
+    <label for="sigla_destino">Sigla Destino:</label>
+    <input list="siglas_destino" id="sigla_destino" name="sigla_destino">
+    <datalist id="siglas_destino"></datalist>
+
+    <label for="cidade_destino">Cidade Destino:</label>
+    <input list="cidades_destino" id="cidade_destino" name="cidade_destino">
+    <datalist id="cidades_destino"></datalist>
+
+    <label for="uf_destino">UF Destino:</label>
+    <input list="ufs_destino" id="uf_destino" name="uf_destino">
+    <datalist id="ufs_destino"></datalist>
   </div>
 
   <label for="peso">Peso (kg):</label>
@@ -123,35 +139,17 @@
       document.getElementById("valorDeclaradoContainer").style.display = (servico !== "funerario") ? "block" : "none";
 
       if (servico === "standard") {
-        const origens = [...new Set(tabelaStandard.flatMap(r => [r.sigla_origem, r.cidade_origem, r.uf_origem]))].sort();
-        const destinos = [...new Set(tabelaStandard.flatMap(r => [r.sigla_destino, r.cidade_destino, r.uf_destino]))].sort();
-        document.getElementById("origens").innerHTML = origens.map(o => `<option value="${o}">`).join('');
-        document.getElementById("destinos").innerHTML = destinos.map(d => `<option value="${d}">`).join('');
-      }
-    }
+        const siglas = [...new Set(tabelaStandard.map(r => r.sigla_origem))].sort();
+        const cidades = [...new Set(tabelaStandard.map(r => r.cidade_origem))].sort();
+        const ufs = [...new Set(tabelaStandard.map(r => r.uf_origem))].sort();
 
-    function calcularTarifa() {
-      const servico = document.getElementById("servico").value;
-      const origem = document.getElementById("origem").value.toLowerCase();
-      const destino = document.getElementById("destino").value.toLowerCase();
-      const peso = parseFloat(document.getElementById("peso").value);
-      const valorDeclarado = parseFloat(document.getElementById("valorDeclarado").value || 0);
+        document.getElementById("siglas_origem").innerHTML = siglas.map(o => `<option value="${o}">`).join('');
+        document.getElementById("cidades_origem").innerHTML = cidades.map(o => `<option value="${o}">`).join('');
+        document.getElementById("ufs_origem").innerHTML = ufs.map(o => `<option value="${o}">`).join('');
 
-      if (servico === "standard") {
-        const rota = tabelaStandard.find(r => {
-          return [r.sigla_origem, r.cidade_origem, r.uf_origem].some(x => x.toLowerCase() === origem)
-              && [r.sigla_destino, r.cidade_destino, r.uf_destino].some(x => x.toLowerCase() === destino);
-        });
-
-        if (!rota) return document.getElementById("resultado").innerText = "Rota não encontrada.";
-
-        let valorBase = peso <= 30 ? rota.minimo : rota.minimo + ((peso - 30) * rota.adicional);
-        const capatazia = peso * 0.20;
-        const emissao = 4.00;
-        const advalorem = valorDeclarado * 0.004;
-        const total = valorBase + capatazia + emissao + advalorem;
-
-        document.getElementById("resultado").innerText = `Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia, emissão e ad-valorem)`;
+        document.getElementById("siglas_destino").innerHTML = siglas.map(o => `<option value="${o}">`).join('');
+        document.getElementById("cidades_destino").innerHTML = cidades.map(o => `<option value="${o}">`).join('');
+        document.getElementById("ufs_destino").innerHTML = ufs.map(o => `<option value="${o}">`).join('');
       }
     }
   </script>
