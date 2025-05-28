@@ -101,8 +101,8 @@
       const servico = document.getElementById("servico").value;
       let dados = servico === "premium" ? tabelaPremium : servico === "expresso" ? tabelaExpresso : tabelaFunerario;
 
-      const origens = [...new Set(dados.map(r => r.origem))].sort();
-      const destinos = [...new Set(dados.map(r => r.destino))].sort();
+      const origens = [...new Set(dados.map(r => r.origem).filter(o => o !== "BR"))].sort();
+      const destinos = [...new Set(dados.map(r => r.destino).filter(d => d !== "BR"))].sort();
 
       origemSelect.innerHTML = origens.map(o => `<option value="${o}">${o}</option>`).join('');
       destinoSelect.innerHTML = destinos.map(d => `<option value="${d}">${d}</option>`).join('');
@@ -152,21 +152,33 @@
 
         const capatazia = peso * 0.20;
         const emissao = 4.00;
-        const advalorem = valorDeclarado * 0.01; // 1% padrão
+        const advalorem = valorDeclarado * 0.01;
         const total = valorBase + capatazia + emissao + advalorem;
 
         document.getElementById("resultado").innerText = `Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia, emissão e ad-valorem)`;
       }
 
       if (servico === "expresso") {
-        rota = tabelaExpresso.find(r => (r.origem === origem || r.origem === "BR") && (r.destino === destino || r.destino === "BR"));
-        if (!rota) return document.getElementById("resultado").innerText = "Rota não encontrada.";
+        const rotasPossiveis = tabelaExpresso.filter(r =>
+          (r.origem === origem || r.origem === "BR") &&
+          (r.destino === destino || r.destino === "BR")
+        );
+
+        if (!rotasPossiveis.length) return document.getElementById("resultado").innerText = "Rota não encontrada.";
 
         const tipos = ["capital", "interior", "redespacho"];
         let resultados = [];
 
         tipos.forEach(tipo => {
-          let dados = rota[tipo];
+          let dados = null;
+
+          for (const rota of rotasPossiveis) {
+            if (rota.origem === origem && rota.destino === destino && rota[tipo]) { dados = rota[tipo]; break; }
+            if (rota.origem === "BR" && rota.destino === destino && rota[tipo]) { dados = rota[tipo]; break; }
+            if (rota.origem === origem && rota.destino === "BR" && rota[tipo]) { dados = rota[tipo]; break; }
+            if (rota.origem === "BR" && rota.destino === "BR" && rota[tipo]) { dados = rota[tipo]; break; }
+          }
+
           if (dados) {
             let valorBase = 0;
             if (peso <= 0.1 && dados.ate_100g) {
@@ -178,7 +190,7 @@
             }
             const capatazia = peso * 0.20;
             const emissao = 4.00;
-            const advalorem = valorDeclarado * 0.007; // 0.7% padrão
+            const advalorem = valorDeclarado * 0.007;
             const total = valorBase + capatazia + emissao + advalorem;
             resultados.push(`${tipo.charAt(0).toUpperCase() + tipo.slice(1)}: R$ ${total.toFixed(2)}`);
           }
