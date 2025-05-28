@@ -31,6 +31,9 @@
       margin-top: 1em;
       color: #555;
     }
+    #valorDeclaradoContainer {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -39,9 +42,15 @@
   <h1>Simulador de Tarifas</h1>
 
   <label for="servico">Serviço:</label>
-  <select id="servico">
+  <select id="servico" onchange="mostrarCampoValor()">
     <option value="funerario">Funerário</option>
+    <option value="premium">Premium</option>
   </select>
+
+  <div id="valorDeclaradoContainer">
+    <label for="valorDeclarado">Valor declarado (R$):</label>
+    <input type="number" step="0.01" id="valorDeclarado" />
+  </div>
 
   <label for="origem">Origem:</label>
   <select id="origem"></select>
@@ -55,19 +64,42 @@
   <button onclick="calcularTarifa()">Calcular</button>
 
   <div id="resultado"></div>
-  <div id="observacao">Impressão de documento adicional: R$ 1,00/página</div>
+  <div id="observacao">
+    Impressão de documento adicional: R$ 1,00/página<br>
+    <strong>Observações Premium:</strong><br>
+    - Ad-valorem carga valor: 2,00%<br>
+    - Ad-valorem carga valor interior: 2,60%<br>
+    - Ad-valorem interior: 1,30%<br>
+    - Artigos Perigosos: R$ 28,00<br>
+    - Radioativos: R$ 80,00<br>
+    - Coleta: R$ 25,00 até 10kg + R$ 0,62/kg adicional<br>
+    - Deslocamento aeroporto: R$ 50,00 até 10kg + R$ 1,00/kg adicional<br>
+    - Reembalagem: R$ 4,00/kg<br>
+    - Devolução: 100% do valor da ida
+  </div>
 
   <script src="dados-funerario.js"></script>
+  <script src="dados-premium.js"></script>
   <script>
     function popularSelects() {
       const origemSelect = document.getElementById("origem");
       const destinoSelect = document.getElementById("destino");
 
-      const origens = [...new Set(tabelaFunerario.map(r => r.origem))].sort();
-      const destinos = [...new Set(tabelaFunerario.map(r => r.destino))].sort();
+      const servico = document.getElementById("servico").value;
+      let dados = servico === "premium" ? tabelaPremium : tabelaFunerario;
+
+      const origens = [...new Set(dados.map(r => r.origem))].sort();
+      const destinos = [...new Set(dados.map(r => r.destino))].sort();
 
       origemSelect.innerHTML = origens.map(o => `<option value="${o}">${o}</option>`).join('');
       destinoSelect.innerHTML = destinos.map(d => `<option value="${d}">${d}</option>`).join('');
+    }
+
+    function mostrarCampoValor() {
+      const servico = document.getElementById("servico").value;
+      const container = document.getElementById("valorDeclaradoContainer");
+      container.style.display = servico === "premium" ? "block" : "none";
+      popularSelects();
     }
 
     function calcularTarifa() {
@@ -75,24 +107,42 @@
       const origem = document.getElementById("origem").value;
       const destino = document.getElementById("destino").value;
       const peso = parseFloat(document.getElementById("peso").value);
+      const valorDeclarado = parseFloat(document.getElementById("valorDeclarado").value || 0);
 
+      let rota;
       if (servico === "funerario") {
-        const rota = tabelaFunerario.find(r => r.origem === origem && r.destino === destino);
-        if (!rota) {
-          document.getElementById("resultado").innerText = "Rota não encontrada.";
-          return;
-        }
+        rota = tabelaFunerario.find(r => r.origem === origem && r.destino === destino);
+        if (!rota) return document.getElementById("resultado").innerText = "Rota não encontrada.";
 
         let valorBase = rota.minimo;
-        if (peso > 6) {
-          valorBase += (peso - 6) * rota.adicional;
-        }
+        if (peso > 6) valorBase += (peso - 6) * rota.adicional;
 
         const capatazia = peso * 0.20;
         const emissao = 4.00;
         const total = valorBase + capatazia + emissao;
 
         document.getElementById("resultado").innerText = `Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia e emissão)`;
+      }
+
+      if (servico === "premium") {
+        rota = tabelaPremium.find(r => r.origem === origem && r.destino === destino);
+        if (!rota) return document.getElementById("resultado").innerText = "Rota não encontrada.";
+
+        let valorBase = 0;
+        if (peso <= 0.1 && rota.ate_100g) {
+          valorBase = rota.ate_100g;
+        } else if (peso > 0.1 && peso <= 30) {
+          valorBase = rota.tarifas[Math.ceil(peso).toString()] || 0;
+        } else {
+          valorBase = rota.tarifas["30"] + (peso - 30) * rota.adicional;
+        }
+
+        const capatazia = peso * 0.20;
+        const emissao = 4.00;
+        const advalorem = valorDeclarado * 0.01; // 1% padrão
+        const total = valorBase + capatazia + emissao + advalorem;
+
+        document.getElementById("resultado").innerText = `Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia, emissão e ad-valorem)`;
       }
     }
 
