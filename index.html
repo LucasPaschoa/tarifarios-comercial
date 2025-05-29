@@ -1,15 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simulador de Tarifas - Azul Cargo Express</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    label { display: block; margin-top: 10px; }
-    select, input { width: 100%; padding: 5px; margin-top: 5px; }
-    #resultado { margin-top: 20px; font-weight: bold; }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Tarifas</title>
 </head>
 <body>
   <h1>Simulador de Tarifas</h1>
@@ -28,18 +22,17 @@
   <div id="camposUF">
     <label for="origem">Origem:</label>
     <select id="origem"></select>
-
     <label for="destino">Destino:</label>
     <select id="destino"></select>
   </div>
 
-  <div id="camposStandard" style="display: none;">
+  <div id="camposStandard" style="display:none">
     <label for="sigla_origem">Sigla Origem:</label>
     <select id="sigla_origem"></select>
     <label for="cidade_origem">Cidade Origem:</label>
     <select id="cidade_origem"></select>
     <label for="uf_origem">UF Origem:</label>
-    <select id="uf_origem"></select>
+    <select id="uf_origem"></select><br>
     <label for="sigla_destino">Sigla Destino:</label>
     <select id="sigla_destino"></select>
     <label for="cidade_destino">Cidade Destino:</label>
@@ -49,15 +42,17 @@
   </div>
 
   <label for="peso">Peso (kg):</label>
-  <input type="number" id="peso" step="0.01" />
+  <input type="number" id="peso" step="0.01">
 
-  <div id="valorDeclaradoContainer" style="display: none;">
+  <div id="valorDeclaradoContainer" style="display:none">
     <label for="valorDeclarado">Valor Declarado (R$):</label>
-    <input type="number" id="valorDeclarado" step="0.01" />
+    <input type="number" id="valorDeclarado" step="0.01">
   </div>
 
   <button onclick="calcularTarifa()">Calcular</button>
-  <div id="resultado"></div>
+
+  <h2>Resultado:</h2>
+  <pre id="resultado"></pre>
 
   <script src="dados-funerario.js"></script>
   <script src="dados-premium.js"></script>
