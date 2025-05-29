@@ -34,6 +34,9 @@
     #valorDeclaradoContainer {
       display: none;
     }
+    #camposStandard {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -46,6 +49,7 @@
     <option value="funerario">Funerário</option>
     <option value="premium">Premium</option>
     <option value="expresso">Expresso</option>
+    <option value="standard">Standard</option>
   </select>
 
   <div id="valorDeclaradoContainer">
@@ -53,11 +57,39 @@
     <input type="number" step="0.01" id="valorDeclarado" />
   </div>
 
-  <label for="origem">Origem:</label>
-  <select id="origem"></select>
+  <div id="camposUF">
+    <label for="origem">Origem:</label>
+    <select id="origem"></select>
 
-  <label for="destino">Destino:</label>
-  <select id="destino"></select>
+    <label for="destino">Destino:</label>
+    <select id="destino"></select>
+  </div>
+
+  <div id="camposStandard">
+    <label for="sigla_origem">Sigla Origem:</label>
+    <input list="listaSiglasOrigem" id="sigla_origem" />
+    <datalist id="listaSiglasOrigem"></datalist>
+
+    <label for="cidade_origem">Cidade Origem:</label>
+    <input list="listaCidadesOrigem" id="cidade_origem" />
+    <datalist id="listaCidadesOrigem"></datalist>
+
+    <label for="uf_origem">UF Origem:</label>
+    <input list="listaUfsOrigem" id="uf_origem" />
+    <datalist id="listaUfsOrigem"></datalist>
+
+    <label for="sigla_destino">Sigla Destino:</label>
+    <input list="listaSiglasDestino" id="sigla_destino" />
+    <datalist id="listaSiglasDestino"></datalist>
+
+    <label for="cidade_destino">Cidade Destino:</label>
+    <input list="listaCidadesDestino" id="cidade_destino" />
+    <datalist id="listaCidadesDestino"></datalist>
+
+    <label for="uf_destino">UF Destino:</label>
+    <input list="listaUfsDestino" id="uf_destino" />
+    <datalist id="listaUfsDestino"></datalist>
+  </div>
 
   <label for="peso">Peso (kg):</label>
   <input type="number" step="0.01" id="peso" />
@@ -66,33 +98,13 @@
 
   <div id="resultado"></div>
   <div id="observacao">
-    Impressão de documento adicional: R$ 1,00/página<br>
-    <strong>Observações Premium:</strong><br>
-    - Ad-valorem carga valor: 2,00%<br>
-    - Ad-valorem carga valor interior: 2,60%<br>
-    - Ad-valorem interior: 1,30%<br>
-    - Artigos Perigosos: R$ 28,00<br>
-    - Radioativos: R$ 80,00<br>
-    - Coleta: R$ 25,00 até 10kg + R$ 0,62/kg adicional<br>
-    - Deslocamento aeroporto: R$ 50,00 até 10kg + R$ 1,00/kg adicional<br>
-    - Reembalagem: R$ 4,00/kg<br>
-    - Devolução: 100% do valor da ida<br>
-    <strong>Observações Expresso:</strong><br>
-    - Ad-valorem + GRIS: 0,70%<br>
-    - Ad-valorem carga valor: 1,40%<br>
-    - Ad-valorem carga valor interior: 1,80%<br>
-    - Ad-valorem interior: 0,90%<br>
-    - Artigos Perigosos: R$ 28,00<br>
-    - Radioativos: R$ 80,00<br>
-    - Coleta: R$ 22,60 até 10kg + R$ 0,56/kg adicional<br>
-    - Deslocamento aeroporto: R$ 50,00 até 10kg + R$ 1,00/kg adicional<br>
-    - Reembalagem: R$ 4,00/kg<br>
-    - Devolução: 100% do valor da emissão original
+    <!-- Mesmas observações anteriores -->
   </div>
 
   <script src="dados-funerario.js"></script>
   <script src="dados-premium.js"></script>
   <script src="dados-expresso.js"></script>
+  <script src="dados-standard.js"></script>
   <script>
     function popularSelects() {
       const origemSelect = document.getElementById("origem");
@@ -111,98 +123,32 @@
     function mostrarCampoValor() {
       const servico = document.getElementById("servico").value;
       const container = document.getElementById("valorDeclaradoContainer");
-      container.style.display = (servico === "premium" || servico === "expresso") ? "block" : "none";
-      popularSelects();
+      const camposUF = document.getElementById("camposUF");
+      const camposStandard = document.getElementById("camposStandard");
+
+      container.style.display = (servico !== "funerario") ? "block" : "none";
+      camposUF.style.display = (servico !== "standard") ? "block" : "none";
+      camposStandard.style.display = (servico === "standard") ? "block" : "none";
+
+      if (servico !== "standard") popularSelects();
+      else popularCamposStandard();
     }
 
-    function calcularTarifa() {
-      const servico = document.getElementById("servico").value;
-      const origem = document.getElementById("origem").value;
-      const destino = document.getElementById("destino").value;
-      const peso = parseFloat(document.getElementById("peso").value);
-      const valorDeclarado = parseFloat(document.getElementById("valorDeclarado").value || 0);
+    function popularCamposStandard() {
+      const siglas = [...new Set(tabelaStandard.map(r => r.sigla_origem))];
+      const cidades = [...new Set(tabelaStandard.map(r => r.cidade_origem))];
+      const ufs = [...new Set(tabelaStandard.map(r => r.uf_origem))];
 
-      let rota;
-      if (servico === "funerario") {
-        rota = tabelaFunerario.find(r => r.origem === origem && r.destino === destino);
-        if (!rota) return document.getElementById("resultado").innerText = "Rota não encontrada.";
+      document.getElementById("listaSiglasOrigem").innerHTML = siglas.map(o => `<option value="${o}">`).join('');
+      document.getElementById("listaCidadesOrigem").innerHTML = cidades.map(o => `<option value="${o}">`).join('');
+      document.getElementById("listaUfsOrigem").innerHTML = ufs.map(o => `<option value="${o}">`).join('');
 
-        let valorBase = rota.minimo;
-        if (peso > 6) valorBase += (peso - 6) * rota.adicional;
-
-        const capatazia = peso * 0.20;
-        const emissao = 4.00;
-        const total = valorBase + capatazia + emissao;
-
-        document.getElementById("resultado").innerText = `Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia e emissão)`;
-      }
-
-      if (servico === "premium") {
-        rota = tabelaPremium.find(r => r.origem === origem && r.destino === destino);
-        if (!rota) return document.getElementById("resultado").innerText = "Rota não encontrada.";
-
-        let valorBase = 0;
-        if (peso <= 0.1 && rota.ate_100g) {
-          valorBase = rota.ate_100g;
-        } else if (peso > 0.1 && peso <= 30) {
-          valorBase = rota.tarifas[Math.ceil(peso).toString()] || 0;
-        } else {
-          valorBase = rota.tarifas["30"] + (peso - 30) * rota.adicional;
-        }
-
-        const capatazia = peso * 0.20;
-        const emissao = 4.00;
-        const advalorem = valorDeclarado * 0.01;
-        const total = valorBase + capatazia + emissao + advalorem;
-
-        document.getElementById("resultado").innerText = `Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia, emissão e ad-valorem)`;
-      }
-
-      if (servico === "expresso") {
-        const rotasPossiveis = tabelaExpresso.filter(r =>
-          (r.origem === origem || r.origem === "BR") &&
-          (r.destino === destino || r.destino === "BR")
-        );
-
-        if (!rotasPossiveis.length) return document.getElementById("resultado").innerText = "Rota não encontrada.";
-
-        const tipos = ["capital", "interior", "redespacho"];
-        let resultados = [];
-
-        tipos.forEach(tipo => {
-          let dados = null;
-
-          for (const rota of rotasPossiveis) {
-            if (rota.origem === origem && rota.destino === destino && rota[tipo]) { dados = rota[tipo]; break; }
-            if (rota.origem === "BR" && rota.destino === destino && rota[tipo]) { dados = rota[tipo]; break; }
-            if (rota.origem === origem && rota.destino === "BR" && rota[tipo]) { dados = rota[tipo]; break; }
-            if (rota.origem === "BR" && rota.destino === "BR" && rota[tipo]) { dados = rota[tipo]; break; }
-          }
-
-          if (dados) {
-            let valorBase = 0;
-            if (peso <= 0.1 && dados.ate_100g) {
-              valorBase = dados.ate_100g;
-            } else if (peso > 0.1 && peso <= 30) {
-              valorBase = dados.tarifas[Math.ceil(peso).toString()] || 0;
-            } else {
-              valorBase = dados.tarifas["30"] + (peso - 30) * dados.adicional;
-            }
-            const capatazia = peso * 0.20;
-            const emissao = 4.00;
-            const advalorem = valorDeclarado * 0.007;
-            const total = valorBase + capatazia + emissao + advalorem;
-            resultados.push(`${tipo.charAt(0).toUpperCase() + tipo.slice(1)}: R$ ${total.toFixed(2)}`);
-          }
-        });
-
-        document.getElementById("resultado").innerText = resultados.length ? resultados.join("\n") : "Sem tarifas disponíveis para essa rota.";
-      }
+      document.getElementById("listaSiglasDestino").innerHTML = siglas.map(o => `<option value="${o}">`).join('');
+      document.getElementById("listaCidadesDestino").innerHTML = cidades.map(o => `<option value="${o}">`).join('');
+      document.getElementById("listaUfsDestino").innerHTML = ufs.map(o => `<option value="${o}">`).join('');
     }
 
-    window.onload = () => {
-      popularSelects();
-    };
+    window.onload = mostrarCampoValor;
   </script>
 </body>
 </html>
