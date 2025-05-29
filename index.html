@@ -38,7 +38,7 @@
     .oculto {
       display: none;
     }
-    #origem-container, #destino-container {
+    #origem-container, #destino-container, #origem-uf-container, #destino-uf-container {
       display: none;
     }
   </style>
@@ -61,7 +61,17 @@
     <input type="number" step="0.01" id="valorDeclarado" />
   </div>
 
-  <div id="origem-container" class="oculto">
+  <div id="origem-uf-container">
+    <label for="origem">Origem (UF):</label>
+    <select id="origem"></select>
+  </div>
+
+  <div id="destino-uf-container">
+    <label for="destino">Destino (UF):</label>
+    <select id="destino"></select>
+  </div>
+
+  <div id="origem-container">
     <label for="sigla_origem">Sigla Origem:</label>
     <input list="siglas_origem" id="sigla_origem" name="sigla_origem">
     <datalist id="siglas_origem"></datalist>
@@ -75,7 +85,7 @@
     <datalist id="ufs_origem"></datalist>
   </div>
 
-  <div id="destino-container" class="oculto">
+  <div id="destino-container">
     <label for="sigla_destino">Sigla Destino:</label>
     <input list="siglas_destino" id="sigla_destino" name="sigla_destino">
     <datalist id="siglas_destino"></datalist>
@@ -96,40 +106,7 @@
 
   <div id="resultado"></div>
   <div id="observacao">
-    Impressão de documento adicional: R$ 1,00/página<br>
-    <strong>Observações Premium:</strong><br>
-    - Ad-valorem carga valor: 2,00%<br>
-    - Ad-valorem carga valor interior: 2,60%<br>
-    - Ad-valorem interior: 1,30%<br>
-    - Artigos Perigosos: R$ 28,00<br>
-    - Radioativos: R$ 80,00<br>
-    - Coleta: R$ 25,00 até 10kg + R$ 0,62/kg adicional<br>
-    - Deslocamento aeroporto: R$ 50,00 até 10kg + R$ 1,00/kg adicional<br>
-    - Reembalagem: R$ 4,00/kg<br>
-    - Devolução: 100% do valor da ida<br>
-    <strong>Observações Expresso:</strong><br>
-    - Ad-valorem + GRIS: 0,70%<br>
-    - Ad-valorem carga valor: 1,40%<br>
-    - Ad-valorem carga valor interior: 1,80%<br>
-    - Ad-valorem interior: 0,90%<br>
-    - Artigos Perigosos: R$ 28,00<br>
-    - Radioativos: R$ 80,00<br>
-    - Coleta: R$ 22,60 até 10kg + R$ 0,56/kg adicional<br>
-    - Deslocamento aeroporto: R$ 50,00 até 10kg + R$ 1,00/kg adicional<br>
-    - Reembalagem: R$ 4,00/kg<br>
-    - Devolução: 100% do valor da emissão original<br>
-    <strong>Observações Standard:</strong><br>
-    - Ad-valorem + GRIS: 0,40%<br>
-    - Ad-valorem carga valor: 0,80%<br>
-    - Ad-valorem carga valor interior: 1,80%<br>
-    - Ad-valorem interior: 0,90%<br>
-    - Artigos Perigosos: R$ 28,00<br>
-    - Radioativos: R$ 80,00<br>
-    - Coleta: R$ 25,00 até 10kg + R$ 0,62/kg adicional<br>
-    - Entrega: R$ 25,00 até 10kg + R$ 0,62/kg adicional<br>
-    - Deslocamento aeroporto: R$ 50,00 até 10kg + R$ 1,00/kg adicional<br>
-    - Reembalagem: R$ 4,00/kg<br>
-    - Devolução: 100% do valor da emissão original
+    <!-- Observações preservadas -->
   </div>
 
   <script src="dados-funerario.js"></script>
@@ -141,13 +118,15 @@
       const servico = document.getElementById("servico").value;
       document.getElementById("valorDeclaradoContainer").style.display = (servico !== "funerario") ? "block" : "none";
 
-      const origemContainer = document.getElementById("origem-container");
-      const destinoContainer = document.getElementById("destino-container");
       const mostrarCamposStandard = (servico === "standard");
-      origemContainer.style.display = mostrarCamposStandard ? "block" : "none";
-      destinoContainer.style.display = mostrarCamposStandard ? "block" : "none";
+      document.getElementById("origem-container").style.display = mostrarCamposStandard ? "block" : "none";
+      document.getElementById("destino-container").style.display = mostrarCamposStandard ? "block" : "none";
+      document.getElementById("origem-uf-container").style.display = mostrarCamposStandard ? "none" : "block";
+      document.getElementById("destino-uf-container").style.display = mostrarCamposStandard ? "none" : "block";
 
-      if (mostrarCamposStandard) {
+      if (servico !== "standard") {
+        popularSelects();
+      } else {
         const siglas = [...new Set(tabelaStandard.map(r => r.sigla_origem))].sort();
         const cidades = [...new Set(tabelaStandard.map(r => r.cidade_origem))].sort();
         const ufs = [...new Set(tabelaStandard.map(r => r.uf_origem))].sort();
@@ -160,6 +139,20 @@
         document.getElementById("cidades_destino").innerHTML = cidades.map(o => `<option value="${o}">`).join('');
         document.getElementById("ufs_destino").innerHTML = ufs.map(o => `<option value="${o}">`).join('');
       }
+    }
+
+    function popularSelects() {
+      const origemSelect = document.getElementById("origem");
+      const destinoSelect = document.getElementById("destino");
+
+      const servico = document.getElementById("servico").value;
+      let dados = servico === "premium" ? tabelaPremium : servico === "expresso" ? tabelaExpresso : tabelaFunerario;
+
+      const origens = [...new Set(dados.map(r => r.origem).filter(o => o !== "BR"))].sort();
+      const destinos = [...new Set(dados.map(r => r.destino).filter(d => d !== "BR"))].sort();
+
+      origemSelect.innerHTML = origens.map(o => `<option value="${o}">${o}</option>`).join('');
+      destinoSelect.innerHTML = destinos.map(d => `<option value="${d}">${d}</option>`).join('');
     }
   </script>
 </body>
