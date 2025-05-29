@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -5,49 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Simulador de Tarifas</title>
   <style>
-    body {
-      font-family: sans-serif;
-      max-width: 600px;
-      margin: auto;
-      padding: 1em;
-    }
-    label, select, input, button {
-      display: block;
-      margin: 0.5em 0;
-      width: 100%;
-      padding: 0.5em;
-    }
-    #resultado {
-      margin-top: 1em;
-      font-weight: bold;
-      white-space: pre-line;
-    }
-    #logo {
-      display: block;
-      margin: 0 auto 1em auto;
-      max-width: 200px;
-    }
-    #observacao {
-      font-size: 0.9em;
-      margin-top: 1em;
-      color: #555;
-    }
-    #valorDeclaradoContainer {
-      display: none;
-    }
-    .oculto {
-      display: none;
-    }
-    #origem-container, #destino-container, #origem-uf-container, #destino-uf-container {
-      display: none;
-    }
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 1em; }
+    label, select, input, button { display: block; margin: 0.5em 0; width: 100%; padding: 0.5em; }
+    #resultado { margin-top: 1em; font-weight: bold; white-space: pre-line; }
+    #origem-uf-container, #destino-uf-container { display: block; }
   </style>
 </head>
 <body>
-  <img id="logo" src="1.png" alt="Logo da empresa" />
-
   <h1>Simulador de Tarifas</h1>
-
   <label for="servico">Serviço:</label>
   <select id="servico" onchange="mostrarCampoValor()">
     <option value="funerario">Funerário</option>
@@ -55,60 +21,22 @@
     <option value="expresso">Expresso</option>
     <option value="standard">Standard</option>
   </select>
-
-  <div id="valorDeclaradoContainer">
+  <div id="valorDeclaradoContainer" style="display:none">
     <label for="valorDeclarado">Valor declarado (R$):</label>
-    <input type="number" step="0.01" id="valorDeclarado" />
+    <input type="number" id="valorDeclarado" />
   </div>
-
   <div id="origem-uf-container">
     <label for="origem">Origem (UF):</label>
     <select id="origem"></select>
   </div>
-
   <div id="destino-uf-container">
     <label for="destino">Destino (UF):</label>
     <select id="destino"></select>
   </div>
-
-  <div id="origem-container">
-    <label for="sigla_origem">Sigla Origem:</label>
-    <input list="siglas_origem" id="sigla_origem" name="sigla_origem">
-    <datalist id="siglas_origem"></datalist>
-
-    <label for="cidade_origem">Cidade Origem:</label>
-    <input list="cidades_origem" id="cidade_origem" name="cidade_origem">
-    <datalist id="cidades_origem"></datalist>
-
-    <label for="uf_origem">UF Origem:</label>
-    <input list="ufs_origem" id="uf_origem" name="uf_origem">
-    <datalist id="ufs_origem"></datalist>
-  </div>
-
-  <div id="destino-container">
-    <label for="sigla_destino">Sigla Destino:</label>
-    <input list="siglas_destino" id="sigla_destino" name="sigla_destino">
-    <datalist id="siglas_destino"></datalist>
-
-    <label for="cidade_destino">Cidade Destino:</label>
-    <input list="cidades_destino" id="cidade_destino" name="cidade_destino">
-    <datalist id="cidades_destino"></datalist>
-
-    <label for="uf_destino">UF Destino:</label>
-    <input list="ufs_destino" id="uf_destino" name="uf_destino">
-    <datalist id="ufs_destino"></datalist>
-  </div>
-
   <label for="peso">Peso (kg):</label>
   <input type="number" step="0.01" id="peso" />
-
   <button onclick="calcularTarifa()">Calcular</button>
-
   <div id="resultado"></div>
-  <div id="observacao">
-    <!-- Observações preservadas -->
-  </div>
-
   <script src="dados-funerario.js"></script>
   <script src="dados-premium.js"></script>
   <script src="dados-expresso.js"></script>
@@ -116,44 +44,41 @@
   <script>
     function mostrarCampoValor() {
       const servico = document.getElementById("servico").value;
-      document.getElementById("valorDeclaradoContainer").style.display = (servico !== "funerario") ? "block" : "none";
-
-      const mostrarCamposStandard = (servico === "standard");
-      document.getElementById("origem-container").style.display = mostrarCamposStandard ? "block" : "none";
-      document.getElementById("destino-container").style.display = mostrarCamposStandard ? "block" : "none";
-      document.getElementById("origem-uf-container").style.display = mostrarCamposStandard ? "none" : "block";
-      document.getElementById("destino-uf-container").style.display = mostrarCamposStandard ? "none" : "block";
-
-      if (servico !== "standard") {
-        popularSelects();
-      } else {
-        const siglas = [...new Set(tabelaStandard.map(r => r.sigla_origem))].sort();
-        const cidades = [...new Set(tabelaStandard.map(r => r.cidade_origem))].sort();
-        const ufs = [...new Set(tabelaStandard.map(r => r.uf_origem))].sort();
-
-        document.getElementById("siglas_origem").innerHTML = siglas.map(o => `<option value="${o}">`).join('');
-        document.getElementById("cidades_origem").innerHTML = cidades.map(o => `<option value="${o}">`).join('');
-        document.getElementById("ufs_origem").innerHTML = ufs.map(o => `<option value="${o}">`).join('');
-
-        document.getElementById("siglas_destino").innerHTML = siglas.map(o => `<option value="${o}">`).join('');
-        document.getElementById("cidades_destino").innerHTML = cidades.map(o => `<option value="${o}">`).join('');
-        document.getElementById("ufs_destino").innerHTML = ufs.map(o => `<option value="${o}">`).join('');
-      }
+      document.getElementById("valorDeclaradoContainer").style.display = servico !== "funerario" ? "block" : "none";
+      popularSelects();
     }
 
     function popularSelects() {
-      const origemSelect = document.getElementById("origem");
-      const destinoSelect = document.getElementById("destino");
-
+      const origem = document.getElementById("origem");
+      const destino = document.getElementById("destino");
       const servico = document.getElementById("servico").value;
-      let dados = servico === "premium" ? tabelaPremium : servico === "expresso" ? tabelaExpresso : tabelaFunerario;
-
-      const origens = [...new Set(dados.map(r => r.origem).filter(o => o !== "BR"))].sort();
-      const destinos = [...new Set(dados.map(r => r.destino).filter(d => d !== "BR"))].sort();
-
-      origemSelect.innerHTML = origens.map(o => `<option value="${o}">${o}</option>`).join('');
-      destinoSelect.innerHTML = destinos.map(d => `<option value="${d}">${d}</option>`).join('');
+      const dados = servico === "premium" ? tabelaPremium : servico === "expresso" ? tabelaExpresso : tabelaFunerario;
+      const origens = [...new Set(dados.map(r => r.origem))].sort();
+      const destinos = [...new Set(dados.map(r => r.destino))].sort();
+      origem.innerHTML = origens.map(o => `<option value="${o}">${o}</option>`).join('');
+      destino.innerHTML = destinos.map(d => `<option value="${d}">${d}</option>`).join('');
     }
+
+    function calcularTarifa() {
+      const servico = document.getElementById("servico").value;
+      const origem = document.getElementById("origem").value;
+      const destino = document.getElementById("destino").value;
+      const peso = parseFloat(document.getElementById("peso").value);
+      const valorDeclarado = parseFloat(document.getElementById("valorDeclarado").value || 0);
+      let rota;
+      if (servico === "funerario") {
+        rota = tabelaFunerario.find(r => r.origem === origem && r.destino === destino);
+        if (!rota) return document.getElementById("resultado").innerText = "Rota não encontrada.";
+        let valorBase = rota.minimo;
+        if (peso > 6) valorBase += (peso - 6) * rota.adicional;
+        const total = valorBase + peso * 0.2 + 4;
+        return document.getElementById("resultado").innerText = `Valor estimado: R$ ${total.toFixed(2)}`;
+      }
+    }
+
+    window.onload = () => {
+      mostrarCampoValor();
+    };
   </script>
 </body>
 </html>
