@@ -1,4 +1,3 @@
-// scripts.js
 
 function calcularTarifa() {
   const servico = document.getElementById("servico").value;
@@ -123,25 +122,28 @@ function calcularEcom(peso, valorDeclarado) {
   const origem = document.getElementById("origem").value;
   const destino = document.getElementById("destino").value;
   const rotasPossiveis = tabelaEcom.filter(r =>
-    (r.ORIGEM === origem || r.ORIGEM === "BR") &&
-    (r.DESTINO === destino || r.DESTINO === "BR")
+    (r.origem === origem || r.origem === "BR") &&
+    (r.destino === destino || r.destino === "BR")
   );
 
   if (!rotasPossiveis.length) return mostrarResultado("Rota não encontrada.");
 
-  const classificacoes = ["CAPITAL", "INTERIOR", "REDESPACHO"];
+  const tipos = ["capital", "interior", "redespacho"];
   let valores = {};
 
-  classificacoes.forEach(tipo => {
+  tipos.forEach(tipo => {
     for (const rota of rotasPossiveis) {
-      if (rota.CLASSIFICACAO === tipo) {
+      if (rota[tipo]) {
+        let dados = rota[tipo];
         let valorBase = 0;
-        if (peso <= 30) {
-          valorBase = rota[`${Math.ceil(peso)}`] || 0;
+        if (peso <= 0.1 && dados.ate_100g) {
+          valorBase = dados.ate_100g;
+        } else if (peso > 0.1 && peso <= 30) {
+          valorBase = dados.tarifas[Math.ceil(peso).toString()] || 0;
         } else {
-          valorBase = rota["30"] + (peso - 30) * rota.Add;
+          valorBase = dados.tarifas["30"] + (peso - 30) * dados.adicional;
         }
-        valores[tipo.toLowerCase()] = valorBase;
+        valores[tipo] = valorBase;
         break;
       }
     }
@@ -149,79 +151,20 @@ function calcularEcom(peso, valorDeclarado) {
 
   const capatazia = peso * 0.20;
   const emissao = 3.00;
+  const advalorem = valorDeclarado * 0.004;
 
   const capital = valores.capital || 0;
   const interior = capital + (valores.interior || 0);
   const redespacho = capital + (valores.redespacho || 0);
 
-  const advaloremCapital = valorDeclarado * 0.012;
-  const advaloremInterior = valorDeclarado * 0.022;
-
   const resultados = [];
-  if (capital) resultados.push(`Capital: R$ ${(capital + capatazia + emissao + advaloremCapital).toFixed(2)}`);
-  if (valores.interior) resultados.push(`Interior: R$ ${(interior + capatazia + emissao + advaloremInterior).toFixed(2)}`);
-  if (valores.redespacho) resultados.push(`Redespacho: R$ ${(redespacho + capatazia + emissao + advaloremInterior).toFixed(2)}`);
+  if (capital) resultados.push(`Capital: R$ ${(capital + capatazia + emissao + advalorem).toFixed(2)}`);
+  if (valores.interior) resultados.push(`Interior: R$ ${(interior + capatazia + emissao + advalorem).toFixed(2)}`);
+  if (valores.redespacho) resultados.push(`Redespacho: R$ ${(redespacho + capatazia + emissao + advalorem).toFixed(2)}`);
 
   mostrarResultado(resultados.length ? resultados.join("\n") : "Sem tarifas disponíveis para essa rota.");
 }
 
 function mostrarResultado(texto) {
   document.getElementById("resultado").innerText = texto;
-}
-
-function mostrarCampoValor() {
-  const servico = document.getElementById("servico").value;
-  document.getElementById("valorDeclaradoContainer").style.display = (servico === "premium" || servico === "expresso" || servico === "ecom") ? "block" : "none";
-  document.getElementById("camposUF").style.display = (servico === "standard") ? "none" : "block";
-  document.getElementById("camposStandard").style.display = (servico === "standard") ? "block" : "none";
-
-  if (servico === "standard") {
-    popularCamposStandard();
-  } else {
-    popularSelects();
-  }
-}
-
-function popularSelects() {
-  const origem = document.getElementById("origem");
-  const destino = document.getElementById("destino");
-  const servico = document.getElementById("servico").value;
-  let dados = [];
-  if (servico === "funerario") dados = tabelaFunerario;
-  else if (servico === "premium") dados = tabelaPremium;
-  else if (servico === "expresso") dados = tabelaExpresso;
-  else if (servico === "ecom") dados = tabelaEcom;
-  else return;
-  const origens = [...new Set(dados.map(r => r.origem || r.ORIGEM).filter(o => o !== "BR"))].sort();
-  const destinos = [...new Set(dados.map(r => r.destino || r.DESTINO).filter(d => d !== "BR"))].sort();
-  origem.innerHTML = '<option value=""></option>' + origens.map(o => `<option value="${o}">${o}</option>`).join('');
-  destino.innerHTML = '<option value=""></option>' + destinos.map(d => `<option value="${d}">${d}</option>`).join('');
-}
-
-document.addEventListener("DOMContentLoaded", mostrarCampoValor);
-
-function popularCamposStandard() {
-  const siglaOrigem = document.getElementById("sigla_origem");
-  const cidadeOrigem = document.getElementById("cidade_origem");
-  const ufOrigem = document.getElementById("uf_origem");
-
-  const siglaDestino = document.getElementById("sigla_destino");
-  const cidadeDestino = document.getElementById("cidade_destino");
-  const ufDestino = document.getElementById("uf_destino");
-
-  const siglasOrigem = [...new Set(tabelaStandard.map(r => r.sigla_origem).filter(Boolean))].sort();
-  const cidadesOrigem = [...new Set(tabelaStandard.map(r => r.cidade_origem).filter(Boolean))].sort();
-  const ufsOrigem = [...new Set(tabelaStandard.map(r => r.uf_origem).filter(Boolean))].sort();
-
-  const siglasDestino = [...new Set(tabelaStandard.map(r => r.sigla_destino).filter(Boolean))].sort();
-  const cidadesDestino = [...new Set(tabelaStandard.map(r => r.cidade_destino).filter(Boolean))].sort();
-  const ufsDestino = [...new Set(tabelaStandard.map(r => r.uf_destino).filter(Boolean))].sort();
-
-  siglaOrigem.innerHTML = '<option value="">Selecione</option>' + siglasOrigem.map(v => `<option value="${v}">${v}</option>`).join('');
-  cidadeOrigem.innerHTML = '<option value="">Selecione</option>' + cidadesOrigem.map(v => `<option value="${v}">${v}</option>`).join('');
-  ufOrigem.innerHTML = '<option value="">Selecione</option>' + ufsOrigem.map(v => `<option value="${v}">${v}</option>`).join('');
-
-  siglaDestino.innerHTML = '<option value="">Selecione</option>' + siglasDestino.map(v => `<option value="${v}">${v}</option>`).join('');
-  cidadeDestino.innerHTML = '<option value="">Selecione</option>' + cidadesDestino.map(v => `<option value="${v}">${v}</option>`).join('');
-  ufDestino.innerHTML = '<option value="">Selecione</option>' + ufsDestino.map(v => `<option value="${v}">${v}</option>`).join('');
 }
