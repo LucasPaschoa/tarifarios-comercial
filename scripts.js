@@ -8,6 +8,7 @@ function calcularTarifa() {
   if (servico === "expresso") return calcularExpresso(peso, valorDeclarado);
   if (servico === "standard") return calcularStandard(peso);
   if (servico === "ecom") return calcularEcom(peso, valorDeclarado);
+  if (servico === "servin") return calcularServin(peso, valorDeclarado);
 }
 
 function calcularFunerario(peso) {
@@ -52,6 +53,10 @@ function calcularExpresso(peso, valorDeclarado) {
 
 function calcularEcom(peso, valorDeclarado) {
   return calcularGenericoComFaixas(tabelaEcomNormalizada, peso, valorDeclarado, 0.004, 3.00);
+}
+
+function calcularServin(peso, valorDeclarado) {
+  return calcularGenericoComFaixas(tabelaServinNormalizada, peso, valorDeclarado, 0.007, 4.00);
 }
 
 function calcularGenericoComFaixas(tabela, peso, valorDeclarado, taxaAdValorem, taxaEmissao) {
@@ -131,7 +136,7 @@ function mostrarResultado(texto) {
 
 function mostrarCampoValor() {
   const servico = document.getElementById("servico").value;
-  document.getElementById("valorDeclaradoContainer").style.display = (servico === "premium" || servico === "expresso" || servico === "ecom") ? "block" : "none";
+  document.getElementById("valorDeclaradoContainer").style.display = (servico === "premium" || servico === "expresso" || servico === "ecom" || servico === "servin") ? "block" : "none";
   document.getElementById("camposUF").style.display = (servico === "standard") ? "none" : "block";
   document.getElementById("camposStandard").style.display = (servico === "standard") ? "block" : "none";
 
@@ -172,6 +177,35 @@ const tabelaEcomNormalizada = (() => {
   return Object.values(grupos);
 })();
 
+const tabelaServinNormalizada = (() => {
+  const grupos = {};
+  tabelaServin.forEach(item => {
+    const origem = item.ORIGEM;
+    const destino = item.DESTINO;
+    const classificacao = item.TAXA.toLowerCase();
+
+    const chave = origem + ";" + destino;
+    if (!grupos[chave]) {
+      grupos[chave] = {
+        origem,
+        destino,
+        capital: null,
+        interior: null,
+        redespacho: null,
+      };
+    }
+    const tarifas = {};
+    Object.keys(item).forEach(k => {
+      if (!isNaN(k)) tarifas[k] = item[k];
+    });
+    grupos[chave][classificacao] = {
+      tarifas,
+      adicional: item.Add
+    };
+  });
+  return Object.values(grupos);
+})();
+
 document.addEventListener("DOMContentLoaded", mostrarCampoValor);
 
 function popularSelects() {
@@ -184,6 +218,7 @@ function popularSelects() {
   else if (servico === "premium") dados = tabelaPremium;
   else if (servico === "expresso") dados = tabelaExpresso;
   else if (servico === "ecom") dados = tabelaEcomNormalizada;
+  else if (servico === "servin") dados = tabelaServinNormalizada;
   else return;
 
   const origens = [...new Set(dados.map(r => r.origem).filter(o => o !== "BR"))].sort();
