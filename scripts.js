@@ -13,6 +13,45 @@ function calcularTarifa() {
   if (servico === "servin") return calcularServin(peso, valorDeclarado);
 }
 
+function mostrarCampoValor() {
+  const servico = document.getElementById("servico").value;
+
+  document.getElementById("valorDeclaradoContainer").style.display =
+    ["premium", "expresso", "ecom", "servin"].includes(servico) ? "block" : "none";
+
+  const camposUF = document.getElementById("camposUF");
+  const camposStandard = document.getElementById("camposStandard");
+
+  if (servico === "standard") {
+    camposUF.style.display = "none";
+    camposStandard.style.display = "block";
+    popularCamposStandard();
+  } else {
+    camposUF.style.display = "block";
+    camposStandard.style.display = "none";
+    popularSelects(servico); // ← essa chamada precisa ser feita sempre
+  }
+}
+
+function popularSelects(servico) {
+  const origem = document.getElementById("origem");
+  const destino = document.getElementById("destino");
+  let dados = [];
+
+  if (servico === "funerario") dados = tabelaFunerario;
+  else if (servico === "premium") dados = tabelaPremium;
+  else if (servico === "expresso") dados = tabelaExpresso;
+  else if (servico === "ecom") dados = tabelaEcom;
+  else if (servico === "servin") dados = tabelaServin;
+  else return;
+
+  const origens = [...new Set(dados.map(r => r.origem).filter(Boolean))].sort();
+  const destinos = [...new Set(dados.map(r => r.destino).filter(Boolean))].sort();
+
+  origem.innerHTML = '<option value="">Selecione</option>' + origens.map(o => `<option value="${o}">${o}</option>`).join('');
+  destino.innerHTML = '<option value="">Selecione</option>' + destinos.map(d => `<option value="${d}">${d}</option>`).join('');
+}
+
 function mostrarResultado(texto) {
   document.getElementById("resultado").innerText = texto;
 }
