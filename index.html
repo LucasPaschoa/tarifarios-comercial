@@ -113,77 +113,26 @@
     - Coleta: R$ 22,60 até 10kg + R$ 0,56/kg adicional<br>
     - Deslocamento aeroporto: R$ 50,00 até 10kg + R$ 1,00/kg adicional<br>
     - Reembalagem: R$ 4,00/kg<br>
-    - Devolução: 100% do valor da emissão original
+    - Devolução: 100% do valor da emissão original<br>
+    <strong>Observações Standard:</strong><br>
+    - Ad-valorem + GRIS: 0,40%<br>
+    - Ad-valorem carga valor: 0,80%<br>
+    - Ad-valorem carga valor interior: 1,80%<br>
+    - Ad-valorem interior: 0,90%<br>
+    - Artigos Perigosos: R$ 28,00<br>
+    - Radioativos: R$ 80,00<br>
+    - Coleta: R$ 25,00 até 10kg + R$ 0,62/kg adicional<br>
+    - Entrega: R$ 25,00 até 10kg + R$ 0,62/kg adicional<br>
+    - Deslocamento aeroporto: R$ 50,00 até 10kg + R$ 1,00/kg adicional<br>
+    - Reembalagem: R$ 4,00/kg<br>
+    - Emissão: R$ 4,00 por conhecimento<br>
+    - Devolução: 100% do valor do frete original
   </div>
 
   <script src="dados-funerario.js"></script>
   <script src="dados-premium.js"></script>
   <script src="dados-expresso.js"></script>
   <script src="dados-standard.js"></script>
-  <script>
-    function calcularFunerario() {
-      const origem = document.getElementById("origem").value;
-      const destino = document.getElementById("destino").value;
-      const peso = parseFloat(document.getElementById("peso").value);
-      const rota = tabelaFunerario.find(r => r.origem === origem && r.destino === destino);
-      if (!rota) return document.getElementById("resultado").innerText = "Rota não encontrada.";
-      let valorBase = rota.minimo;
-      if (peso > 6) valorBase += (peso - 6) * rota.adicional;
-      const capatazia = peso * 0.20;
-      const emissao = 4.00;
-      const total = valorBase + capatazia + emissao;
-      document.getElementById("resultado").innerText = `Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia e emissão)`;
-    }
-
-    function calcularPremium() {
-      const origem = document.getElementById("origem").value;
-      const destino = document.getElementById("destino").value;
-      const peso = parseFloat(document.getElementById("peso").value);
-      const valorDeclarado = parseFloat(document.getElementById("valorDeclarado").value || 0);
-      const rota = tabelaPremium.find(r => r.origem === origem && r.destino === destino);
-      if (!rota) return document.getElementById("resultado").innerText = "Rota não encontrada.";
-      let valorBase = 0;
-      if (peso <= 0.1 && rota.ate_100g) valorBase = rota.ate_100g;
-      else if (peso > 0.1 && peso <= 30) valorBase = rota.tarifas[Math.ceil(peso).toString()] || 0;
-      else valorBase = rota.tarifas["30"] + (peso - 30) * rota.adicional;
-      const capatazia = peso * 0.20;
-      const emissao = 4.00;
-      const advalorem = valorDeclarado * 0.01;
-      const total = valorBase + capatazia + emissao + advalorem;
-      document.getElementById("resultado").innerText = `Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia, emissão e ad-valorem)`;
-    }
-
-    function calcularExpresso() {
-      const origem = document.getElementById("origem").value;
-      const destino = document.getElementById("destino").value;
-      const peso = parseFloat(document.getElementById("peso").value);
-      const valorDeclarado = parseFloat(document.getElementById("valorDeclarado").value || 0);
-      const rotas = tabelaExpresso.filter(r => (r.origem === origem || r.origem === "BR") && (r.destino === destino || r.destino === "BR"));
-      if (!rotas.length) return document.getElementById("resultado").innerText = "Rota não encontrada.";
-      const tipos = ["capital", "interior", "redespacho"];
-      let resultados = [];
-      tipos.forEach(tipo => {
-        let dados = null;
-        for (const rota of rotas) {
-          if (rota.origem === origem && rota.destino === destino && rota[tipo]) { dados = rota[tipo]; break; }
-          if (rota.origem === "BR" && rota.destino === destino && rota[tipo]) { dados = rota[tipo]; break; }
-          if (rota.origem === origem && rota.destino === "BR" && rota[tipo]) { dados = rota[tipo]; break; }
-          if (rota.origem === "BR" && rota.destino === "BR" && rota[tipo]) { dados = rota[tipo]; break; }
-        }
-        if (dados) {
-          let valorBase = 0;
-          if (peso <= 0.1 && dados.ate_100g) valorBase = dados.ate_100g;
-          else if (peso > 0.1 && peso <= 30) valorBase = dados.tarifas[Math.ceil(peso).toString()] || 0;
-          else valorBase = dados.tarifas["30"] + (peso - 30) * dados.adicional;
-          const capatazia = peso * 0.20;
-          const emissao = 4.00;
-          const advalorem = valorDeclarado * 0.007;
-          const total = valorBase + capatazia + emissao + advalorem;
-          resultados.push(`${tipo.charAt(0).toUpperCase() + tipo.slice(1)}: R$ ${total.toFixed(2)}`);
-        }
-      });
-      document.getElementById("resultado").innerText = resultados.length ? resultados.join("\n") : "Sem tarifas disponíveis para essa rota.";
-    }
-  </script>
+  <script src="scripts.js"></script>
 </body>
 </html>
