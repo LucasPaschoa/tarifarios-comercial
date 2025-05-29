@@ -38,6 +38,9 @@
     .oculto {
       display: none;
     }
+    #origem-container, #destino-container {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -141,8 +144,8 @@
       const origemContainer = document.getElementById("origem-container");
       const destinoContainer = document.getElementById("destino-container");
       const mostrarCamposStandard = (servico === "standard");
-      origemContainer.classList.toggle("oculto", !mostrarCamposStandard);
-      destinoContainer.classList.toggle("oculto", !mostrarCamposStandard);
+      origemContainer.style.display = mostrarCamposStandard ? "block" : "none";
+      destinoContainer.style.display = mostrarCamposStandard ? "block" : "none";
 
       if (mostrarCamposStandard) {
         const siglas = [...new Set(tabelaStandard.map(r => r.sigla_origem))].sort();
