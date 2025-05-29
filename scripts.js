@@ -125,7 +125,15 @@ function mostrarCampoValor() {
   document.getElementById("valorDeclaradoContainer").style.display = (servico === "premium" || servico === "expresso") ? "block" : "none";
   document.getElementById("camposUF").style.display = (servico === "standard") ? "none" : "block";
   document.getElementById("camposStandard").style.display = (servico === "standard") ? "block" : "none";
-  popularSelects();
+
+  if (servico === "standard") {
+    popularCamposStandard();
+  } else {
+    popularSelects();
+  }
+}
+
+;
 }
 
 function popularSelects() {
@@ -144,3 +152,30 @@ function popularSelects() {
 }
 
 document.addEventListener("DOMContentLoaded", mostrarCampoValor);
+
+function popularCamposStandard() {
+  const siglaOrigem = document.getElementById("sigla_origem");
+  const cidadeOrigem = document.getElementById("cidade_origem");
+  const ufOrigem = document.getElementById("uf_origem");
+
+  const siglaDestino = document.getElementById("sigla_destino");
+  const cidadeDestino = document.getElementById("cidade_destino");
+  const ufDestino = document.getElementById("uf_destino");
+
+  const siglasOrigem = [...new Set(tabelaStandard.map(r => r.sigla_origem).filter(Boolean))].sort();
+  const cidadesOrigem = [...new Set(tabelaStandard.map(r => r.cidade_origem).filter(Boolean))].sort();
+  const ufsOrigem = [...new Set(tabelaStandard.map(r => r.uf_origem).filter(Boolean))].sort();
+
+  const siglasDestino = [...new Set(tabelaStandard.map(r => r.sigla_destino).filter(Boolean))].sort();
+  const cidadesDestino = [...new Set(tabelaStandard.map(r => r.cidade_destino).filter(Boolean))].sort();
+  const ufsDestino = [...new Set(tabelaStandard.map(r => r.uf_destino).filter(Boolean))].sort();
+
+  siglaOrigem.innerHTML = '<option value="">Selecione</option>' + siglasOrigem.map(v => `<option value="${v}">${v}</option>`).join('');
+  cidadeOrigem.innerHTML = '<option value="">Selecione</option>' + cidadesOrigem.map(v => `<option value="${v}">${v}</option>`).join('');
+  ufOrigem.innerHTML = '<option value="">Selecione</option>' + ufsOrigem.map(v => `<option value="${v}">${v}</option>`).join('');
+
+  siglaDestino.innerHTML = '<option value="">Selecione</option>' + siglasDestino.map(v => `<option value="${v}">${v}</option>`).join('');
+  cidadeDestino.innerHTML = '<option value="">Selecione</option>' + cidadesDestino.map(v => `<option value="${v}">${v}</option>`).join('');
+  ufDestino.innerHTML = '<option value="">Selecione</option>' + ufsDestino.map(v => `<option value="${v}">${v}</option>`).join('');
+}
+
