@@ -35,7 +35,7 @@
     #valorDeclaradoContainer {
       display: none;
     }
-    #origem-container, #destino-container {
+    .oculto {
       display: none;
     }
   </style>
@@ -137,10 +137,14 @@
     function mostrarCampoValor() {
       const servico = document.getElementById("servico").value;
       document.getElementById("valorDeclaradoContainer").style.display = (servico !== "funerario") ? "block" : "none";
-      document.getElementById("origem-container").classList.toggle("oculto", servico !== "standard");
-      document.getElementById("destino-container").classList.toggle("oculto", servico !== "standard");
 
-      if (servico === "standard") {
+      const origemContainer = document.getElementById("origem-container");
+      const destinoContainer = document.getElementById("destino-container");
+      const mostrarCamposStandard = (servico === "standard");
+      origemContainer.classList.toggle("oculto", !mostrarCamposStandard);
+      destinoContainer.classList.toggle("oculto", !mostrarCamposStandard);
+
+      if (mostrarCamposStandard) {
         const siglas = [...new Set(tabelaStandard.map(r => r.sigla_origem))].sort();
         const cidades = [...new Set(tabelaStandard.map(r => r.cidade_origem))].sort();
         const ufs = [...new Set(tabelaStandard.map(r => r.uf_origem))].sort();
