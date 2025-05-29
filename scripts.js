@@ -1,3 +1,5 @@
+// scripts.js
+
 function calcularTarifa() {
   const servico = document.getElementById("servico").value;
   const peso = parseFloat(document.getElementById("peso").value);
@@ -133,9 +135,6 @@ function mostrarCampoValor() {
   }
 }
 
-;
-}
-
 function popularSelects() {
   const origem = document.getElementById("origem");
   const destino = document.getElementById("destino");
@@ -178,4 +177,3 @@ function popularCamposStandard() {
   cidadeDestino.innerHTML = '<option value="">Selecione</option>' + cidadesDestino.map(v => `<option value="${v}">${v}</option>`).join('');
   ufDestino.innerHTML = '<option value="">Selecione</option>' + ufsDestino.map(v => `<option value="${v}">${v}</option>`).join('');
 }
-
