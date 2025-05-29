@@ -9,6 +9,7 @@ function calcularTarifa() {
   if (servico === "premium") return calcularPremium(peso, valorDeclarado);
   if (servico === "expresso") return calcularExpresso(peso, valorDeclarado);
   if (servico === "standard") return calcularStandard(peso);
+  if (servico === "ecom") return calcularEcom(peso, valorDeclarado);
 }
 
 function calcularFunerario(peso) {
@@ -118,13 +119,59 @@ function calcularStandard(peso) {
   mostrarResultado(`Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia e emissão)`);
 }
 
+function calcularEcom(peso, valorDeclarado) {
+  const origem = document.getElementById("origem").value;
+  const destino = document.getElementById("destino").value;
+  const rotasPossiveis = tabelaEcom.filter(r =>
+    (r.ORIGEM === origem || r.ORIGEM === "BR") &&
+    (r.DESTINO === destino || r.DESTINO === "BR")
+  );
+
+  if (!rotasPossiveis.length) return mostrarResultado("Rota não encontrada.");
+
+  const classificacoes = ["CAPITAL", "INTERIOR", "REDESPACHO"];
+  let valores = {};
+
+  classificacoes.forEach(tipo => {
+    for (const rota of rotasPossiveis) {
+      if (rota.CLASSIFICACAO === tipo) {
+        let valorBase = 0;
+        if (peso <= 30) {
+          valorBase = rota[`${Math.ceil(peso)}`] || 0;
+        } else {
+          valorBase = rota["30"] + (peso - 30) * rota.Add;
+        }
+        valores[tipo.toLowerCase()] = valorBase;
+        break;
+      }
+    }
+  });
+
+  const capatazia = peso * 0.20;
+  const emissao = 3.00;
+
+  const capital = valores.capital || 0;
+  const interior = capital + (valores.interior || 0);
+  const redespacho = capital + (valores.redespacho || 0);
+
+  const advaloremCapital = valorDeclarado * 0.012;
+  const advaloremInterior = valorDeclarado * 0.022;
+
+  const resultados = [];
+  if (capital) resultados.push(`Capital: R$ ${(capital + capatazia + emissao + advaloremCapital).toFixed(2)}`);
+  if (valores.interior) resultados.push(`Interior: R$ ${(interior + capatazia + emissao + advaloremInterior).toFixed(2)}`);
+  if (valores.redespacho) resultados.push(`Redespacho: R$ ${(redespacho + capatazia + emissao + advaloremInterior).toFixed(2)}`);
+
+  mostrarResultado(resultados.length ? resultados.join("\n") : "Sem tarifas disponíveis para essa rota.");
+}
+
 function mostrarResultado(texto) {
   document.getElementById("resultado").innerText = texto;
 }
 
 function mostrarCampoValor() {
   const servico = document.getElementById("servico").value;
-  document.getElementById("valorDeclaradoContainer").style.display = (servico === "premium" || servico === "expresso") ? "block" : "none";
+  document.getElementById("valorDeclaradoContainer").style.display = (servico === "premium" || servico === "expresso" || servico === "ecom") ? "block" : "none";
   document.getElementById("camposUF").style.display = (servico === "standard") ? "none" : "block";
   document.getElementById("camposStandard").style.display = (servico === "standard") ? "block" : "none";
 
@@ -143,9 +190,10 @@ function popularSelects() {
   if (servico === "funerario") dados = tabelaFunerario;
   else if (servico === "premium") dados = tabelaPremium;
   else if (servico === "expresso") dados = tabelaExpresso;
+  else if (servico === "ecom") dados = tabelaEcom;
   else return;
-  const origens = [...new Set(dados.map(r => r.origem).filter(o => o !== "BR"))].sort();
-  const destinos = [...new Set(dados.map(r => r.destino).filter(d => d !== "BR"))].sort();
+  const origens = [...new Set(dados.map(r => r.origem || r.ORIGEM).filter(o => o !== "BR"))].sort();
+  const destinos = [...new Set(dados.map(r => r.destino || r.DESTINO).filter(d => d !== "BR"))].sort();
   origem.innerHTML = '<option value=""></option>' + origens.map(o => `<option value="${o}">${o}</option>`).join('');
   destino.innerHTML = '<option value=""></option>' + destinos.map(d => `<option value="${d}">${d}</option>`).join('');
 }
