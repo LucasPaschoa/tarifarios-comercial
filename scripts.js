@@ -30,7 +30,11 @@ function mostrarCampoValor() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", mostrarCampoValor);
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("servico").value = "";
+  popularSelects(); // inicializa selects vazios
+});
+
 
 function popularSelects() {
   const origem = document.getElementById("origem");
@@ -40,8 +44,8 @@ function popularSelects() {
   if (servico === "funerario") dados = tabelaFunerario;
   else if (servico === "premium") dados = tabelaPremium;
   else if (servico === "expresso") dados = tabelaExpresso;
-  else if (servico === "ecom") dados = tabelaEcom;
-  else if (servico === "servin") dados = tabelaServin;
+  else if (servico === "ecom") dados = tabelaEcomNormalizada;
+  else if (servico === "servin") dados = tabelaServinNormalizada;
   else return;
 
   const origens = [...new Set(dados.map(r => r.origem).filter(Boolean))].sort();
@@ -72,3 +76,6 @@ function popularCamposStandard() {
   cidadeDestino.innerHTML = '<option value="">Selecione</option>' + cidadesDestino.map(v => `<option value="${v}">${v}</option>`).join('');
   ufDestino.innerHTML = '<option value="">Selecione</option>' + ufsDestino.map(v => `<option value="${v}">${v}</option>`).join('');
 }
+
+if (!servico) return mostrarResultado("Selecione um serviço.");
+if (isNaN(peso) || peso <= 0) return mostrarResultado("Informe um peso válido.");
