@@ -93,7 +93,27 @@ function calcularExpresso(peso, valorDeclarado) {
 }
 
 function calcularStandard(peso) {
-  mostrarResultado("Simulação para Standard em desenvolvimento.");
+  const siglaOrigem = document.getElementById("sigla_origem").value.trim().toUpperCase();
+  const cidadeOrigem = document.getElementById("cidade_origem").value.trim().toUpperCase();
+  const ufOrigem = document.getElementById("uf_origem").value.trim().toUpperCase();
+  const siglaDestino = document.getElementById("sigla_destino").value.trim().toUpperCase();
+  const cidadeDestino = document.getElementById("cidade_destino").value.trim().toUpperCase();
+  const ufDestino = document.getElementById("uf_destino").value.trim().toUpperCase();
+
+  const rota = tabelaStandard.find(r =>
+    (r.sigla_origem === siglaOrigem || r.cidade_origem === cidadeOrigem || r.uf_origem === ufOrigem) &&
+    (r.sigla_destino === siglaDestino || r.cidade_destino === cidadeDestino || r.uf_destino === ufDestino)
+  );
+
+  if (!rota) return mostrarResultado("Rota não encontrada.");
+
+  let valorBase = rota.minimo;
+  if (peso > 10) valorBase += (peso - 10) * rota.adicional;
+
+  const capatazia = peso * 0.20;
+  const emissao = 4.00;
+  const total = valorBase + capatazia + emissao;
+  mostrarResultado(`Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia e emissão)`);
 }
 
 function mostrarResultado(texto) {
@@ -119,8 +139,8 @@ function popularSelects() {
   else return;
   const origens = [...new Set(dados.map(r => r.origem).filter(o => o !== "BR"))].sort();
   const destinos = [...new Set(dados.map(r => r.destino).filter(d => d !== "BR"))].sort();
-  origem.innerHTML = origens.map(o => `<option value="${o}">${o}</option>`).join('');
-  destino.innerHTML = destinos.map(d => `<option value="${d}">${d}</option>`).join('');
+  origem.innerHTML = '<option value=""></option>' + origens.map(o => `<option value="${o}">${o}</option>`).join('');
+  destino.innerHTML = '<option value=""></option>' + destinos.map(d => `<option value="${d}">${d}</option>`).join('');
 }
 
 document.addEventListener("DOMContentLoaded", mostrarCampoValor);
