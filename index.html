@@ -1,59 +1,63 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simulador de Tarifas - Azul Cargo</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simulador de Tarifas</title>
 </head>
 <body>
-  <div class="container">
-    <h1>Simulador de Tarifas</h1>
-    <label for="servico">Serviço:</label>
-    <select id="servico" onchange="mostrarCampoValor()">
-      <option value="">Selecione</option>
-      <option value="funerario">Funerário</option>
-      <option value="premium">Premium</option>
-      <option value="expresso">Expresso</option>
-      <option value="standard">Standard</option>
-      <option value="ecom">Ecom</option>
-      <option value="servin">SERVIN</option>
-    </select>
+  <h1>Simulador de Tarifas</h1>
 
-    <div id="camposUF">
-      <label for="origem">Origem:</label>
-      <select id="origem"></select>
-      <label for="destino">Destino:</label>
-      <select id="destino"></select>
-    </div>
+  <label for="servico">Serviço:</label>
+  <select id="servico" onchange="mostrarCampoValor()">
+    <option value="">Selecione</option>
+    <option value="funerario">Funerário</option>
+    <option value="premium">Premium</option>
+    <option value="expresso">Expresso</option>
+    <option value="standard">Standard</option>
+    <option value="ecom">Ecom</option>
+    <option value="servin">Servin</option>
+  </select>
 
-    <div id="camposStandard" style="display:none">
-      <label for="sigla_origem">Sigla Origem:</label>
-      <select id="sigla_origem"></select>
-      <label for="cidade_origem">Cidade Origem:</label>
-      <select id="cidade_origem"></select>
-      <label for="uf_origem">UF Origem:</label>
-      <select id="uf_origem"></select>
+  <div id="camposUF" style="display:none;">
+    <label for="origem">Origem:</label>
+    <select id="origem"></select>
 
-      <label for="sigla_destino">Sigla Destino:</label>
-      <select id="sigla_destino"></select>
-      <label for="cidade_destino">Cidade Destino:</label>
-      <select id="cidade_destino"></select>
-      <label for="uf_destino">UF Destino:</label>
-      <select id="uf_destino"></select>
-    </div>
-
-    <label for="peso">Peso (kg):</label>
-    <input type="number" id="peso" min="0.01" step="0.01" />
-
-    <div id="valorDeclaradoContainer" style="display:none">
-      <label for="valorDeclarado">Valor Declarado (R$):</label>
-      <input type="number" id="valorDeclarado" min="0" step="0.01" />
-    </div>
-
-    <button onclick="calcularTarifa()">Calcular</button>
-    <pre id="resultado"></pre>
+    <label for="destino">Destino:</label>
+    <select id="destino"></select>
   </div>
+
+  <div id="camposStandard" style="display:none;">
+    <label for="sigla_origem">Sigla Origem:</label>
+    <select id="sigla_origem"></select>
+
+    <label for="cidade_origem">Cidade Origem:</label>
+    <select id="cidade_origem"></select>
+
+    <label for="uf_origem">UF Origem:</label>
+    <select id="uf_origem"></select>
+
+    <label for="sigla_destino">Sigla Destino:</label>
+    <select id="sigla_destino"></select>
+
+    <label for="cidade_destino">Cidade Destino:</label>
+    <select id="cidade_destino"></select>
+
+    <label for="uf_destino">UF Destino:</label>
+    <select id="uf_destino"></select>
+  </div>
+
+  <label for="peso">Peso (kg):</label>
+  <input type="number" step="0.01" id="peso" />
+
+  <div id="valorDeclaradoContainer" style="display:none;">
+    <label for="valorDeclarado">Valor Declarado (R$):</label>
+    <input type="number" step="0.01" id="valorDeclarado" />
+  </div>
+
+  <button onclick="calcularTarifa()">Calcular</button>
+
+  <pre id="resultado"></pre>
 
   <script src="dados-funerario.js"></script>
   <script src="dados-premium.js"></script>
