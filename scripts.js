@@ -51,7 +51,7 @@ function calcularExpresso(peso, valorDeclarado) {
 }
 
 function calcularEcom(peso, valorDeclarado) {
-  return calcularGenericoComFaixas(tabelaEcom, peso, valorDeclarado, 0.004, 3.00);
+  return calcularGenericoComFaixas(tabelaEcomNormalizada, peso, valorDeclarado, 0.004, 3.00);
 }
 
 function calcularGenericoComFaixas(tabela, peso, valorDeclarado, taxaAdValorem, taxaEmissao) {
@@ -142,6 +142,36 @@ function mostrarCampoValor() {
   }
 }
 
+// Conversão dos dados brutos de Ecom para o formato usado no script
+const tabelaEcomNormalizada = (() => {
+  const grupos = {};
+  tabelaEcom.forEach(item => {
+    const origem = item.ORIGEM;
+    const destino = item.DESTINO;
+    const classificacao = item.CLASSIFICACAO.toLowerCase();
+
+    const chave = origem + ";" + destino;
+    if (!grupos[chave]) {
+      grupos[chave] = {
+        origem,
+        destino,
+        capital: null,
+        interior: null,
+        redespacho: null,
+      };
+    }
+    const tarifas = {};
+    Object.keys(item).forEach(k => {
+      if (!isNaN(k)) tarifas[k] = item[k];
+    });
+    grupos[chave][classificacao] = {
+      tarifas,
+      adicional: item.Add
+    };
+  });
+  return Object.values(grupos);
+})();
+
 document.addEventListener("DOMContentLoaded", mostrarCampoValor);
 
 function popularSelects() {
@@ -153,7 +183,7 @@ function popularSelects() {
   if (servico === "funerario") dados = tabelaFunerario;
   else if (servico === "premium") dados = tabelaPremium;
   else if (servico === "expresso") dados = tabelaExpresso;
-  else if (servico === "ecom") dados = tabelaEcom;
+  else if (servico === "ecom") dados = tabelaEcomNormalizada;
   else return;
 
   const origens = [...new Set(dados.map(r => r.origem).filter(o => o !== "BR"))].sort();
