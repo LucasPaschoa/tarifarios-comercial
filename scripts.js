@@ -256,3 +256,34 @@ function calcularServin(peso, valorDeclarado) {
 
   mostrarResultado(resultados.length ? resultados.join("\n") : "Sem tarifas disponíveis para essa rota.");
 }
+
+
+function popularSelects() {
+  const origem = document.getElementById("origem");
+  const destino = document.getElementById("destino");
+  const servico = document.getElementById("servico").value;
+  let dados = [];
+
+  if (servico === "funerario") dados = tabelaFunerario;
+  else if (servico === "premium") dados = tabelaPremium;
+  else if (servico === "expresso") dados = tabelaExpresso;
+  else if (servico === "ecom") dados = tabelaEcom;
+  else if (servico === "servin") dados = tabelaServin;
+  else return;
+
+  const origens = [...new Set(dados.map(r => r.origem).filter(Boolean))].sort();
+  const destinos = [...new Set(dados.map(r => r.destino).filter(Boolean))].sort();
+  origem.innerHTML = '<option value=""></option>' + origens.map(o => `<option value="${o}">${o}</option>`).join('');
+  destino.innerHTML = '<option value=""></option>' + destinos.map(d => `<option value="${d}">${d}</option>`).join('');
+}
+
+function popularCamposStandard() {
+  const siglaOrigem = document.getElementById("sigla_origem");
+  const siglaDestino = document.getElementById("sigla_destino");
+
+  const siglasOrigem = [...new Set(tabelaStandard.map(r => r.sigla_origem).filter(Boolean))].sort();
+  const siglasDestino = [...new Set(tabelaStandard.map(r => r.sigla_destino).filter(Boolean))].sort();
+
+  siglaOrigem.innerHTML = '<option value="">Selecione</option>' + siglasOrigem.map(v => `<option value="${v}">${v}</option>`).join('');
+  siglaDestino.innerHTML = '<option value="">Selecione</option>' + siglasDestino.map(v => `<option value="${v}">${v}</option>`).join('');
+}
