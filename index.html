@@ -4,13 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simulador de Tarifas</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text x=%224%22 y=%2212%22>📦</text></svg>">
 </head>
 <body>
   <h1>Simulador de Tarifas</h1>
 
   <label for="servico">Serviço:</label>
-  <select id="servico">
+  <select id="servico" onchange="mostrarCampoValor()">
     <option value="">Selecione</option>
     <option value="funerario">Funerário</option>
     <option value="premium">Premium</option>
@@ -30,8 +29,16 @@
   <div id="camposStandard" style="display:none">
     <label for="sigla_origem">Sigla Origem:</label>
     <select id="sigla_origem"></select>
+    <label for="cidade_origem">Cidade Origem:</label>
+    <select id="cidade_origem"></select>
+    <label for="uf_origem">UF Origem:</label>
+    <select id="uf_origem"></select><br>
     <label for="sigla_destino">Sigla Destino:</label>
     <select id="sigla_destino"></select>
+    <label for="cidade_destino">Cidade Destino:</label>
+    <select id="cidade_destino"></select>
+    <label for="uf_destino">UF Destino:</label>
+    <select id="uf_destino"></select>
   </div>
 
   <label for="peso">Peso (kg):</label>
@@ -54,12 +61,5 @@
   <script src="dados-ecom.js"></script>
   <script src="dados-servin.js"></script>
   <script src="scripts.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const select = document.getElementById("servico");
-      select.addEventListener("change", mostrarCampoValor);
-      mostrarCampoValor();
-    });
-  </script>
 </body>
 </html>
