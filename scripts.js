@@ -141,15 +141,11 @@ function calcularExpresso(peso, valorDeclarado) {
 
 function calcularStandard(peso) {
   const siglaOrigem = document.getElementById("sigla_origem").value.trim().toUpperCase();
-  const cidadeOrigem = document.getElementById("cidade_origem").value.trim().toUpperCase();
-  const ufOrigem = document.getElementById("uf_origem").value.trim().toUpperCase();
   const siglaDestino = document.getElementById("sigla_destino").value.trim().toUpperCase();
-  const cidadeDestino = document.getElementById("cidade_destino").value.trim().toUpperCase();
-  const ufDestino = document.getElementById("uf_destino").value.trim().toUpperCase();
-
+  
   const rota = tabelaStandard.find(r =>
-    (r.sigla_origem === siglaOrigem || r.cidade_origem === cidadeOrigem || r.uf_origem === ufOrigem) &&
-    (r.sigla_destino === siglaDestino || r.cidade_destino === cidadeDestino || r.uf_destino === ufDestino)
+    (r.sigla_origem === siglaOrigem) &&
+    (r.sigla_destino === siglaDestino)
   );
 
   if (!rota) return mostrarResultado("Rota não encontrada.");
