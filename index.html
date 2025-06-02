@@ -6,17 +6,11 @@
   <title>Simulador de Tarifas</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text x=%224%22 y=%2212%22>📦</text></svg>">
 </head>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    mostrarCampoValor(); // Preenche selects ao carregar
-  });
-</script>
-
 <body>
   <h1>Simulador de Tarifas</h1>
 
   <label for="servico">Serviço:</label>
-  <select id="servico" onchange="mostrarCampoValor()">
+  <select id="servico">
     <option value="">Selecione</option>
     <option value="funerario">Funerário</option>
     <option value="premium">Premium</option>
@@ -60,11 +54,12 @@
   <script src="dados-ecom.js"></script>
   <script src="dados-servin.js"></script>
   <script src="scripts.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const select = document.getElementById("servico");
+      select.addEventListener("change", mostrarCampoValor);
+      mostrarCampoValor();
+    });
+  </script>
 </body>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    mostrarCampoValor(); // Preenche selects ao carregar a página
-  });
-</script>
-  
 </html>
