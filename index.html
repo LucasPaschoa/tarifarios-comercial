@@ -52,7 +52,7 @@
 </head>
 <body>
   <div class="simulador-container">
-    <img src="1.png" alt="Logo Azul Cargo Express" class="logo">
+    <img src="logo.png" alt="Logo Azul Cargo Express" class="logo">
     <h1>Simulador de Tarifas</h1>
 
     <div class="info-box">
@@ -70,6 +70,8 @@
       <option value="premium">Premium</option>
       <option value="expresso">Expresso</option>
       <option value="standard">Standard</option>
+      <option value="ecom">Ecom</option>
+      <option value="servin">Servin</option>
     </select>
 
     <div id="camposUF">
@@ -106,6 +108,41 @@
   <script src="dados-premium.js"></script>
   <script src="dados-expresso.js"></script>
   <script src="dados-standard.js"></script>
+  <script src="dados-ecom.js"></script>
+  <script src="dados-servin.js"></script>
+  <script>
+    function calcularTarifa() {
+      const servico = document.getElementById("servico").value;
+      const peso = parseFloat(document.getElementById("peso").value);
+      const valorDeclarado = parseFloat(document.getElementById("valorDeclarado").value || 0);
+
+      if (servico === "funerario") return calcularFunerario(peso);
+      if (servico === "premium") return calcularPremium(peso, valorDeclarado);
+      if (servico === "expresso") return calcularExpresso(peso, valorDeclarado);
+      if (servico === "standard") return calcularStandard(peso);
+      if (servico === "ecom") return calcularEcom(peso, valorDeclarado);
+      if (servico === "servin") return calcularServin(peso, valorDeclarado);
+    }
+
+    function calcularStandard(peso) {
+      const siglaOrigem = document.getElementById("sigla_origem").value.trim().toUpperCase();
+      const siglaDestino = document.getElementById("sigla_destino").value.trim().toUpperCase();
+
+      const rota = tabelaStandard.find(r =>
+        r.sigla_origem === siglaOrigem && r.sigla_destino === siglaDestino
+      );
+
+      if (!rota) return mostrarResultado("Rota não encontrada.");
+
+      let valorBase = rota.minimo;
+      if (peso > 10) valorBase += (peso - 10) * rota.adicional;
+
+      const capatazia = peso * 0.20;
+      const emissao = 4.00;
+      const total = valorBase + capatazia + emissao;
+      mostrarResultado(`Valor estimado: R$ ${total.toFixed(2)} (incluindo capatazia e emissão)`);
+    }
+  </script>
   <script src="scripts.js"></script>
 </body>
 </html>
