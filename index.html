@@ -4,54 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simulador de Tarifas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .simulador-container {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+    label, select, input {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .logo {
+      width: 150px;
+      display: block;
+      margin: 0 auto 20px;
+    }
+    .info-box {
+      background-color: #e7f3ff;
+      border-left: 4px solid #007bff;
+      padding: 10px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .disclaimer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #555;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <h1>Simulador de Tarifas</h1>
+  <div class="simulador-container">
+    <img src="1.png" alt="Logo Azul Cargo Express" class="logo">
+    <h1>Simulador de Tarifas</h1>
 
-  <label for="servico">Serviço:</label>
-  <select id="servico" onchange="mostrarCampoValor()">
-    <option value="">Selecione</option>
-    <option value="funerario">Funerário</option>
-    <option value="premium">Premium</option>
-    <option value="expresso">Expresso</option>
-    <option value="standard">Standard</option>
-    <option value="ecom">Ecom</option>
-    <option value="servin">Servin</option>
-  </select>
+    <div class="info-box">
+      Este simulador permite calcular tarifas estimadas para os serviços da Azul Cargo Express. As tarifas são válidas para: <br>
+      <strong>Funerário:</strong> Transporte especializado de urnas funerárias com cuidado e segurança. <br>
+      <strong>Premium:</strong> Entregas prioritárias com tratamento especial. <br>
+      <strong>Expresso:</strong> Transporte rápido e eficiente para diversas regiões. <br>
+      <strong>Standard:</strong> Solução econômica para rotas padronizadas. <br>
+    </div>
 
-  <div id="camposUF">
-    <label for="origem">Origem:</label>
-    <select id="origem"></select>
-    <label for="destino">Destino:</label>
-    <select id="destino"></select>
+    <label for="servico">Serviço:</label>
+    <select id="servico" onchange="mostrarCampoValor()">
+      <option value="">Selecione</option>
+      <option value="funerario">Funerário</option>
+      <option value="premium">Premium</option>
+      <option value="expresso">Expresso</option>
+      <option value="standard">Standard</option>
+    </select>
+
+    <div id="camposUF">
+      <label for="origem">Origem:</label>
+      <select id="origem"></select>
+      <label for="destino">Destino:</label>
+      <select id="destino"></select>
+    </div>
+
+    <div id="camposStandard" style="display:none">
+      <label for="sigla_origem">Sigla Origem:</label>
+      <select id="sigla_origem"></select>
+      <label for="sigla_destino">Sigla Destino:</label>
+      <select id="sigla_destino"></select>
+    </div>
+
+    <label for="peso">Peso (kg):</label>
+    <input type="number" id="peso" step="0.01">
+
+    <div id="valorDeclaradoContainer" style="display:none">
+      <label for="valorDeclarado">Valor Declarado (R$):</label>
+      <input type="number" id="valorDeclarado" step="0.01">
+    </div>
+
+    <button onclick="calcularTarifa()">Calcular</button>
+
+    <h2>Resultado:</h2>
+    <pre id="resultado"></pre>
+
+    <p class="disclaimer">Em breve: cálculo de tarifas também disponível para os serviços Ecom e Servin!</p>
   </div>
-
-  <div id="camposStandard" style="display:none">
-    <label for="sigla_origem">Sigla Origem:</label>
-    <select id="sigla_origem"></select>
-    <label for="sigla_destino">Sigla Destino:</label>
-    <select id="sigla_destino"></select>
-  </div>
-
-  <label for="peso">Peso (kg):</label>
-  <input type="number" id="peso" step="0.01">
-
-  <div id="valorDeclaradoContainer" style="display:none">
-    <label for="valorDeclarado">Valor Declarado (R$):</label>
-    <input type="number" id="valorDeclarado" step="0.01">
-  </div>
-
-  <button onclick="calcularTarifa()">Calcular</button>
-
-  <h2>Resultado:</h2>
-  <pre id="resultado"></pre>
 
   <script src="dados-funerario.js"></script>
   <script src="dados-premium.js"></script>
   <script src="dados-expresso.js"></script>
   <script src="dados-standard.js"></script>
-  <script src="dados-ecom.js"></script>
-  <script src="dados-servin.js"></script>
   <script src="scripts.js"></script>
 </body>
 </html>
